@@ -1,0 +1,67 @@
+
+{
+  "metadata": {
+    "university": "Politecnico di Milano",
+    "degree": "Computer Science",
+    "max_credits_per_semester": 36,
+    "total_credits_required": 120
+  },
+  "courses": {
+    "CS101": {
+      "name": "Programming Fundamentals",
+      "credits": 12,
+      "prereqs": [],
+      "offered": ["fall", "spring"],
+      "difficulty": 1
+    },
+    "CS201": {
+      "name": "Data Structures",
+      "credits": 12,
+      "prereqs": ["CS101"],
+      "offered": ["fall", "spring"],
+      "difficulty": 2
+    },
+    "CS202": {
+      "name": "Algorithms",
+      "credits": 12,
+      "prereqs": ["CS201"],
+      "offered": ["fall", "spring"],
+      "difficulty": 3
+    },
+    "MATH101": {
+      "name": "Discrete Mathematics",
+      "credits": 12,
+      "prereqs": [],
+      "offered": ["fall"],
+      "difficulty": 2
+    },
+    "CS301": {
+      "name": "Operating Systems",
+      "credits": 12,
+      "prereqs": ["CS202", "MATH101"],
+      "offered": ["spring"],
+      "difficulty": 3
+    },
+    "CS302": {
+      "name": "Computer Networks",
+      "credits": 12,
+      "prereqs": ["CS202"],
+      "offered": ["fall"],
+      "difficulty": 3
+    },
+    "CS401": {
+      "name": "Machine Learning",
+      "credits": 12,
+      "prereqs": ["CS202", "MATH101"],
+      "offered": ["spring"],
+      "difficulty": 4
+    },
+    "CS402": {
+      "name": "Capstone Project",
+      "credits": 24,
+      "prereqs": ["CS301", "CS302"],
+      "offered": ["fall", "spring"],
+      "difficulty": 4
+    }
+  }
+}
