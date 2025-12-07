@@ -1,7 +1,3 @@
-"""
-Topological sort implementation for course prerequisite graphs.
-Handles cycle detection and generates valid course sequences.
-"""
 
 from collections import defaultdict, deque
 from typing import Dict, List
