@@ -37,12 +37,15 @@ def main():
         print(f"✓ Schedule validation: {message}\n")
         
         # Display semester plan
+        semester_types = ["Fall", "Spring"] * (len(schedule) // 2 + 1)
         for i, semester in enumerate(schedule, 1):
             total_credits = sum(courses[c]["credits"] for c in semester)
-            print(f"--- Semester {i} ({total_credits} credits) ---")
+            sem_type = semester_types[i-1] if i-1 < len(semester_types) else "Semester"
+            print(f"--- {sem_type} {i} ({total_credits} credits) ---")
             for course in semester:
                 info = courses[course]
-                print(f"  {course}: {info['name']} ({info['credits']} credits)")
+                offered = ", ".join(info.get("offered", ["fall", "spring"]))
+                print(f"  {course}: {info['name']} ({info['credits']} credits) [Offered: {offered}]")
             print()
     
     except ValueError as e:

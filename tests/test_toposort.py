@@ -38,6 +38,20 @@ def test_scheduler():
     assert len(schedule) >= 3
     is_valid, msg = validate_schedule(courses, schedule)
     assert is_valid, msg
+    
+def test_semester_availability():
+    courses = {
+        "A": {"prereqs": [], "credits": 12, "offered": ["fall"]},
+        "B": {"prereqs": ["A"], "credits": 12, "offered": ["spring"]},
+        "C": {"prereqs": ["B"], "credits": 12, "offered": ["fall"]},
+    }
+    scheduler = SemesterScheduler(courses, max_credits=24)
+    schedule = scheduler.schedule_semesters()
+    
+    # Should be 3 semesters: Fall, Spring, Fall
+    assert len(schedule) == 3
+    is_valid, msg = validate_schedule(courses, schedule)
+    assert is_valid, msg    
 
 if __name__ == "__main__":
     pytest.main([__file__])

@@ -8,34 +8,58 @@ class SemesterScheduler:
         self.max_credits = max_credits
         self.graph = CourseGraph(courses)
     
+    
+   
     def schedule_semesters(self) -> List[List[str]]:
-       
+        """Schedules courses into semesters respecting credit limits AND semester availability."""
         course_order = self.graph.topological_sort()
         completed = set()
         semesters = []
+        empty_semester_count = 0  # Track consecutive empty semesters
+        
+        semester_counter = 0
         
         while course_order:
+            is_fall = semester_counter % 2 == 0
             current_semester = []
             current_credits = 0
             
+            # Try to schedule courses for this semester
             for course in list(course_order):
                 info = self.courses[course]
                 
                 # Check if all prereqs are completed
                 if all(prereq in completed for prereq in info.get("prereqs", [])):
-                    # Check credit limit
-                    if current_credits + info["credits"] <= self.max_credits:
-                        current_semester.append(course)
-                        current_credits += info["credits"]
-                        course_order.remove(course)
+                    # Check if course is offered this semester
+                    offered = info.get("offered", ["fall", "spring"])
+                    current_semester_type = "fall" if is_fall else "spring"
+                    
+                    if current_semester_type in offered:
+                        # Check credit limit
+                        if current_credits + info["credits"] <= self.max_credits:
+                            current_semester.append(course)
+                            current_credits += info["credits"]
+                            course_order.remove(course)
             
             if not current_semester:
-                raise ValueError("Cannot schedule remaining courses within credit limits")
+                # No courses scheduled this semester
+                empty_semester_count += 1
+                if empty_semester_count >= 4:  # Give up after 4 empty semesters
+                    raise ValueError(f"Cannot schedule remaining courses: {course_order}")
+            else:
+                empty_semester_count = 0  # Reset when we make progress
             
+            # Add semester (even if empty, we track the slot)
             semesters.append(current_semester)
             completed.update(current_semester)
+            semester_counter += 1
+            
+            # Safety break
+            if semester_counter > len(self.courses) * 3:
+                raise ValueError("Too many semesters created")
         
-        return semesters
+        # Filter out empty semesters
+        return [s for s in semesters if s]
 
 def validate_schedule(courses: Dict, schedule: List[List[str]]) -> Tuple[bool, str]:
     
