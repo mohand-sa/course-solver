@@ -1,6 +1,8 @@
 import pytest
+import os
 from solver.toposort import CourseGraph
 from solver.scheduler import SemesterScheduler, validate_schedule
+from visualizer.degree_chart import create_degree_roadmap, create_workload_chart
 
 def test_simple_toposort():
     courses = {
@@ -34,24 +36,44 @@ def test_scheduler():
     }
     scheduler = SemesterScheduler(courses, max_credits=24)
     schedule = scheduler.schedule_semesters()
-    
     assert len(schedule) >= 3
     is_valid, msg = validate_schedule(courses, schedule)
     assert is_valid, msg
-    
+
 def test_semester_availability():
     courses = {
         "A": {"prereqs": [], "credits": 12, "offered": ["fall"]},
         "B": {"prereqs": ["A"], "credits": 12, "offered": ["spring"]},
-        "C": {"prereqs": ["B"], "credits": 12, "offered": ["fall"]},
+        "C": {"prereqs": ["B"], "credits": 12, "offered": ["fall"]}
+    }
+    scheduler = SemesterScheduler(courses, max_credits=24)
+    schedule = scheduler.schedule_semesters()
+    is_valid, msg = validate_schedule(courses, schedule)
+    assert is_valid, msg
+    # Should be 3 semesters (Fall-Spring-Fall)
+    assert len(schedule) == 3
+
+def test_visualization():
+    """Test that visualization functions create PNG files."""
+    courses = {
+        "A": {"name": "Course A", "prereqs": [], "credits": 12, "offered": ["fall"], "difficulty": 1},
+        "B": {"name": "Course B", "prereqs": ["A"], "credits": 12, "offered": ["spring"], "difficulty": 2},
+        "C": {"name": "Course C", "prereqs": ["B"], "credits": 12, "offered": ["fall"], "difficulty": 3}
     }
     scheduler = SemesterScheduler(courses, max_credits=24)
     schedule = scheduler.schedule_semesters()
     
-    # Should be 3 semesters: Fall, Spring, Fall
-    assert len(schedule) == 3
-    is_valid, msg = validate_schedule(courses, schedule)
-    assert is_valid, msg    
+    # Test roadmap
+    roadmap_path = create_degree_roadmap(courses, schedule, "docs/test_roadmap.png")
+    assert os.path.exists(roadmap_path), "Roadmap PNG not created"
+    
+    # Test workload chart
+    chart_path = create_workload_chart(schedule, courses, "docs/test_workload.png")
+    assert os.path.exists(chart_path), "Workload PNG not created"
+    
+    # Cleanup
+    os.remove(roadmap_path)
+    os.remove(chart_path)
 
 if __name__ == "__main__":
     pytest.main([__file__])
